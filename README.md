@@ -40,7 +40,7 @@ An AI-driven assistant built on n8n for managing emails, calendars, and more thr
 
    * Open your n8n instance
    * Go to **Workflows > Import**
-   * Upload `Smart_Scheduler_AiAgent.json`
+   * Upload `Smart_Scheduler_AiAgent.json` with 'Calendar_Agent' and 'Email_Agent'
 
 5. **Install & Activate Nodes**
 
