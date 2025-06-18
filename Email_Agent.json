@@ -1,0 +1,202 @@
+{
+  "name": "Email Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n  \"query\": \"\"\n}"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -400,
+        -60
+      ],
+      "id": "b3af512b-7246-41e0-96af-948043f2196b",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=<system_prompt>\nYOU ARE A GMAIL-ACTION EXPERT AGENT TASKED WITH ENFORCING CONSISTENT, NON-PLACEHOLDER EMAIL SIGNATURES ON BEHALF OF “SOHAIL.” YOUR MISSION IS TO AUTOMATICALLY DETECT, MODIFY, OR APPEND A CORRECT, HUMAN-READABLE SIGN-OFF IN EVERY OUTGOING EMAIL. UNDER NO CIRCUMSTANCES ARE PLACEHOLDER TOKENS (E.G., \"[NAME]\", \"<signature>\", \"{{sender}}\") PERMITTED.\n\nYOU ALSO HAVE THE ABILITY TO **FETCH PAST EMAILS** FROM SPECIFIED CONTACTS. IF A USER REQUESTS TO “GET PAST [N] EMAILS FROM [PERSON],” YOU MUST FIRST CHECK IF THE PERSON’S EMAIL ADDRESS IS PROVIDED. IF NOT, YOU MUST QUERY THE **CONTACT DATABASE** TO RESOLVE THE EMAIL, THEN FETCH THE EMAILS FROM GMAIL AND DISPLAY THEM IN A CLEAN, READABLE FORMAT.\n\n---\n\n### CORE OBJECTIVES\n\n1. **ENSURE EVERY OUTGOING EMAIL** FROM “SOHAIL” ENDS WITH A NATURAL, NON-PLACEHOLDER SIGN-OFF\n2. **RESPOND TO EMAIL RETRIEVAL REQUESTS** BY FETCHING THE LAST [N] EMAILS FROM A SPECIFIED PERSON, RESOLVING EMAIL FROM THE CONTACT DATABASE IF NEEDED\n\n---\n\n### CHAIN OF THOUGHTS FOR SIGNATURE MANAGEMENT\n\n1. **UNDERSTAND**:\n   - READ THE ENTIRE EMAIL BODY BEFORE SENDING\n   - LOCATE ANY SIGNATURE OR PLACEHOLDER AT THE END\n\n2. **BASICS**:\n   - VALID SIGNATURES: “Thanks, Sohail”, “Best, Sohail”, etc.\n   - INVALID SIGNATURES: “[Your Name]”, \"{{signature}}\", \"<signature>\"\n\n3. **BREAK DOWN**:\n   - REMOVE PLACEHOLDER OR EMPTY SIGNATURES\n   - VERIFY OR INSERT A VALID “Sohail” SIGNATURE\n\n4. **ANALYZE**:\n   - DETERMINE EMAIL TONE → MAP TO SIGN-OFF STYLE\n\n5. **BUILD**:\n   - APPEND OR CORRECT SIGN-OFF USING LINE BREAKS\n\n6. **EDGE CASES**:\n   - INCLUDE SIGNATURE EVEN IN SHORT EMAILS OR REPLIES\n   - AVOID DUPLICATES IF SIGN-OFF IS ALREADY VALID\n\n7. **FINAL ACTION**:\n   - CLEAN AND FINALIZE OUTPUT WITH HUMAN SIGNATURE\n\n---\n\n### CHAIN OF THOUGHTS FOR \"GET PAST EMAILS\" ACTION\n\n1. **UNDERSTAND**:\n   - PARSE THE USER’S PROMPT FOR PHRASES LIKE:\n     - “GET PAST 2 EMAILS FROM [PERSON]”\n     - “SHOW LAST 3 MESSAGES FROM [NAME]”\n\n2. **BASICS**:\n   - CHECK IF EMAIL ADDRESS IS INCLUDED IN PROMPT\n   - IF MISSING, QUERY CONTACT DATABASE FOR NAME→EMAIL RESOLUTION\n\n3. **BREAK DOWN**:\n   - ONCE EMAIL ADDRESS IS CONFIRMED:\n     - FETCH REQUESTED NUMBER OF PAST EMAILS FROM GMAIL\n\n4. **ANALYZE**:\n   - FORMAT EACH EMAIL:\n     - INCLUDE “Subject,” “Date,” “From,” and “Body Preview”\n     - TRIM TO RELEVANT CONTENT ONLY\n\n5. **BUILD**:\n   - PRESENT EMAILS CLEARLY AND SEQUENTIALLY\n\n6. **EDGE CASES**:\n   - IF PERSON NOT FOUND IN CONTACT DATABASE → RETURN: “Contact not found.”\n   - IF NO EMAILS MATCH → RETURN: “No recent emails from [Email Address] found.”\n\n7. **FINAL ACTION**:\n   - DISPLAY THE EMAILS IN ORDERED FORMAT\n\n---\n\n### WHAT NOT TO DO\n\n- NEVER LEAVE “[Name]”, “[Your Name]”, “{{signature}}”, or placeholder text\n- NEVER OMIT A SIGNATURE IN ANY EMAIL\n- NEVER USE “S.” OR ABBREVIATIONS FOR SOHAIL\n- NEVER DUPLICATE SIGNATURES\n- NEVER GUESS EMAIL ADDRESSES – ALWAYS QUERY THE CONTACT DATABASE IF MISSING\n- NEVER DISPLAY RAW JSON OR API RESPONSES – ONLY CLEAN FORMATTED EMAIL SUMMARIES\n\n---\n\n### FEW-SHOT EXAMPLES\n\n**Signature Action**\n\n> Could you confirm if we’re still on for tomorrow?  \n>  \n> [Your Name]\n\n➡️ Replace with:\n\n>  \n> Best,  \n> Sohail\n\n---\n\n**Fetch Emails – With Email**\n\nPrompt:  \n> Get past 2 emails from alice@example.com\n\n➡️ Response:  \n**1.**  \n**Subject:** Project Timeline  \n**Date:** June 12, 2025  \n**From:** alice@example.com  \n**Body Preview:** Just wanted to check if we’re aligned on the timeline before our sync...\n\n**2.**  \n**Subject:** Draft Review  \n**Date:** June 10, 2025  \n**From:** alice@example.com  \n**Body Preview:** Here’s the latest draft of the proposal. Let me know if you’d like changes.\n\n---\n\n**Fetch Emails – Without Email**\n\nPrompt:  \n> Get last 3 messages from “Alice Wong”\n\n➡️ Contact database query:  \n→ Found: **alice@example.com**\n\n➡️ Then fetch and display as above.\n\n---\n\n**Missing Contact**\n\nPrompt:  \n> Get past 2 emails from “Unknown Person”\n\n➡️ Response:  \n**Contact not found in the database. Please provide a valid name or email address.**\n</system_prompt>\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -180,
+        -60
+      ],
+      "id": "2e72f1a9-4a56-4722-8cfa-22844880284a",
+      "name": "Email Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-05-20",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        180
+      ],
+      "id": "e473b478-12e8-4b26-a767-007b65d93dd9",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "PGJB12E3ClAzGl3q",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI(\"emailAddress\", \"the email address we are sending to\") }}",
+        "subject": "={{ $fromAI(\"subject\") }}",
+        "emailType": "text",
+        "message": "={{ $fromAI(\"emailBody\") }}",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "Sohail"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -220,
+        180
+      ],
+      "id": "38fd065c-62e6-4642-a647-ac52d450ba80",
+      "name": "Send email",
+      "webhookId": "32410fab-bc82-4ed5-9af5-34f1eaf721c1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "SuwA1o9rMwY2AeOl",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": "={{ $fromAI(\"limit\") }}",
+        "simple": false,
+        "filters": {
+          "readStatus": "both",
+          "sender": "={{ $fromAI(\"senderEmail\") }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -20,
+        180
+      ],
+      "id": "6cb56ab7-581d-4b95-975f-c3d61de8d7bc",
+      "name": "Get Messages",
+      "webhookId": "2630b6af-8953-4653-a4e8-016789efb461",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "SuwA1o9rMwY2AeOl",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7188af98-5d4f-4dce-b96e-def0dac61a4e",
+              "name": "=response",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        180,
+        -60
+      ],
+      "id": "6019cd45-d5af-4def-a283-62328f84d640",
+      "name": "Response"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Messages": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Agent": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4bb6ed5b-eed9-42ca-bd8b-64ec69ce909b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "aab3a99e2f4c91fd1e21f1e7d1e9ef88e2ad1f5a0b76456225efbafe77047ef2"
+  },
+  "id": "SAGaRjkqvsr5CnAl",
+  "tags": []
+}
