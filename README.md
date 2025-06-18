@@ -3,7 +3,8 @@
 An AI-driven assistant built on n8n for managing emails, calendars, and more through text and voice interaction via Telegram and Eleven Labs.
 
 ---
-
+##Video Walkthrough
+https://drive.google.com/file/d/1cV4nXqxTf8mRcLiRF3ahsKugfOhyJies/view?usp=sharing
 ## 🚀 Features
 
 * **Unified Communication:** Manage email, calendar, and tasks through text or voice in Telegram.
